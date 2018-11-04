@@ -106,30 +106,26 @@ const ReactionMinigame = class extends Minigame {
     }
     
     for (let i=0;i<4;++i) {
-      const alive = this.game.gamestate.players[i].alive;
+      if (!this.game.gamestate.players[i].alive) continue;
+
       const minigameState = this.game.gamestate.players[i].minigameState;
       let text = `${this.game.gamestate.players[i].username}: `;
 
-      if (alive) {
-        const offset = text.length;
-        if (minigameState.guess) {
-          text += ` ${minigameState.guess} `;
-        } else {
-          text += '...';
-        }
-
-        this.playerProgressLabels[i].text = text;
-
-        if (minigameState.guess) {
-          if (minigameState.guess == this.letter) {
-            this.playerProgressLabels[i].addColor('#0f0', offset);
-          } else {
-            this.playerProgressLabels[i].addColor('#f00', offset);
-          }
-        }
+      const offset = text.length;
+      if (minigameState.guess) {
+        text += ` ${minigameState.guess} `;
       } else {
-        text += '*ELIM*';
-        this.playerProgressLabels[i].addColor('#f00', 0);
+        text += '...';
+      }
+
+      this.playerProgressLabels[i].text = text;
+
+      if (minigameState.guess) {
+        if (minigameState.guess == this.letter) {
+          this.playerProgressLabels[i].addColor('#0f0', offset);
+        } else {
+          this.playerProgressLabels[i].addColor('#f00', offset);
+        }
       }
     }
   }

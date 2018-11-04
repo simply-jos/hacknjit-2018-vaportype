@@ -65,7 +65,7 @@ exports.Game = class {
       // last player to react gets hit, all players who guess wrong get hit
       const slowboys = [];
       for (const player of this.players) {
-        if (!player.minigameState.guess) {
+        if (!player.minigameState.guess && player.alive) {
           slowboys.push(player);
         }
       }
@@ -79,7 +79,7 @@ exports.Game = class {
       // last player to finish gets hit
       const unfinished = [];
       for (const player of this.players) {
-        if (player.minigameState.progress != 1) {
+        if (player.minigameState.progress != 1 && player.alive) {
           unfinished.push(player);
         }
       }
@@ -101,7 +101,7 @@ exports.Game = class {
   }
 
   async PlayRandomMinigame() {
-    const random = 0; //randomIntFromInterval(0, 1);
+    const random = randomIntFromInterval(0, 1);
 
     // Reset all players minigame state
     for (const player of this.players) {
@@ -122,7 +122,7 @@ exports.Game = class {
         roundNumber: this.roundNumber,
         minigameName: 'ReactionMinigame',
         letter: randLetter(),
-        revealFrame: randomIntFromInterval(250, 600)
+        revealFrame: randomIntFromInterval(150, 400)
       })
     } else if (random == 1) {
       const phrases = [
