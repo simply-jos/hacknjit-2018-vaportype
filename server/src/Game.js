@@ -149,7 +149,7 @@ exports.Game = class {
   }
 
   async PlayRandomMinigame() {
-    const random = 4; // randomIntFromInterval(0, 3);
+    const random = randomIntFromInterval(0, 4);
 
     // Reset all players minigame state
     for (const player of this.players) {
