@@ -104,6 +104,20 @@ const Game = class {
     });
   }
 
+  IsLocalPlayerWinner() {
+    // check if at least 3 are dead, trust me, this will always work lmao
+    let numDead = 0;
+    for (const player of this.gamestate.players) {
+      if (!player.alive) {
+        numDead++;
+      }
+    }
+
+    if (numDead >= 3) {
+      return true;
+    }
+  }
+
   IsLocalPlayerDead() {
     // insert into our own player
     for (const player of this.gamestate.players) {

@@ -19,6 +19,10 @@ const AfterMinigame = class extends State {
       this.resultsLabel.text = 'YOU WERE ELIMINATED';
     }
 
+    if (this.game.IsLocalPlayerWinner()) {
+      this.resultsLabel.text = 'YOU WON!!';
+    }
+
     this.playerLabels = [];
     this.scoreLabels = [];
 

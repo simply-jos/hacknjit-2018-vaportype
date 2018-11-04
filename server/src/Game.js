@@ -170,6 +170,18 @@ exports.Game = class {
 
       // Wait a bit
       await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Check if only one player left, if so, congrats bro
+      let numPlayersAlive = 0;
+      for (const player of this.players) {
+        if (player.alive) {
+          numPlayersAlive++;
+        }
+      }
+
+      if (numPlayersAlive <= 1) {
+        break;
+      }
     }
   }
 
