@@ -70,7 +70,9 @@ const Game = class {
       if (data.minigameName == 'ReactionMinigame') {
         minigame = new ReactionMinigame(this, data.letter, data.revealFrame);
       } else if (data.minigameName == 'TyperaceMinigame') {
-        minigame = new TyperaceMinigame(this, data.text)
+        minigame = new TyperaceMinigame(this, data.text);
+      } else if (data.minigameName == 'MathMinigame') {
+        minigame = new MathMinigame(this, data.a, data.b, data.op, data.result);
       }
 
       this.SetState(

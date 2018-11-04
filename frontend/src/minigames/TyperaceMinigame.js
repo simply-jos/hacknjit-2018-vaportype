@@ -5,6 +5,8 @@ const TyperaceMinigame = class extends Minigame {
     this.frame = 0;
     this.text = text;
     this.localTypedText = '';
+
+    this.localFinished = false;
   }
 
   Init() {
@@ -63,11 +65,13 @@ const TyperaceMinigame = class extends Minigame {
     }
 
     // Add to the locally typed text
-    for (const c of this.game.input.GetInputString()) {
-      if (c == '\b')
-        this.localTypedText = this.localTypedText.substring(0, this.localTypedText.length - 1);
-      else
-        this.localTypedText += c;
+    if (!this.localFinished) {
+      for (const c of this.game.input.GetInputString()) {
+        if (c == '\b')
+          this.localTypedText = this.localTypedText.substring(0, this.localTypedText.length - 1);
+        else
+          this.localTypedText += c;
+      }
     }
 
 
@@ -95,6 +99,9 @@ const TyperaceMinigame = class extends Minigame {
       nonMatchingEndPos = matchingEndPos + charsWrong;
     }
 
+    if (numMatching == this.text.length) {
+      this.localFinished = true;
+    }
 
     if (this.textLabel) this.textLabel.destroy();
 
@@ -128,6 +135,7 @@ const TyperaceMinigame = class extends Minigame {
       let playerProgress = minigameState.progress || 0;
 
       let progressText = `${this.game.gamestate.players[i].username}: `; //[`;
+      let offset = progressText.length;
 
       progressText += '[';
       for (let j = 0; j < 25; ++j) {
@@ -141,6 +149,11 @@ const TyperaceMinigame = class extends Minigame {
       progressText += ']';
 
       this.playerProgressLabels[i].text = progressText;
+
+      if (playerProgress == 1) {
+        this.playerProgressLabels[i].addColor('#0f0', offset);
+      }
+
       this.playerProgressLabels[i].mask = this.game.invertedBackgroundMask;
     }
   }

@@ -95,13 +95,33 @@ exports.Game = class {
       if (unfinished.length == 0) {
         return true;
       }
+    } else if (this.minigameMetadata.minigameName == 'MathMinigame') {
+      // last player to finish gets hit
+      const unfinished = [];
+      for (const player of this.players) {
+        if (!player.minigameState.correct && player.alive) {
+          unfinished.push(player);
+        }
+      }
+
+      // this guy sucked
+      if (unfinished.length == 1) {
+        unfinished[0].Hurt();
+
+        return true;
+      }
+      
+      // nobody sucked?? wtf
+      if (unfinished.length == 0) {
+        return true;
+      }
     }
 
     return false;
   }
 
   async PlayRandomMinigame() {
-    const random = randomIntFromInterval(0, 1);
+    const random = 2; //randomIntFromInterval(0, 2);
 
     // Reset all players minigame state
     for (const player of this.players) {
@@ -142,6 +162,32 @@ exports.Game = class {
         roundNumber: this.roundNumber,
         minigameName: 'TyperaceMinigame',
         text: phrase
+      });
+    } else if (random == 2) {
+      const random = randomIntFromInterval(0, 1);
+      const operations = ['-', '+'];
+      const op = operations[random];
+
+      let a = 0;
+      let b = 0;
+      let result = 0;
+      if (op == '-') {
+        // force a higher
+        a = randomIntFromInterval(25, 50);
+        b = randomIntFromInterval(1, 24);
+
+        result = a - b;
+      } else {
+        a = randomIntFromInterval(1, 25);
+        b = randomIntFromInterval(1, 25);
+        
+        result = a + b;
+      }
+
+      this.SetCurrentMinigame({
+        roundNumber: this.roundNumber,
+        minigameName: 'MathMinigame',
+        a, b, op, result
       });
     }
   }
