@@ -4,7 +4,6 @@ function ResizeHandler() {
   // Scale to fit window, maintain aspect ratio
   // to smallest dimension
   let menu = document.getElementById("game_holder");
-  let menuOutline = document.getElementById("game_holder_outline");
 
   if (!menu) {
     return;
@@ -29,13 +28,40 @@ window.onresize = ResizeHandler;
 ResizeHandler();
 
 const Game = class {
-  constructor() {
-    this.players = [
-      new Player("jos"),
-      new Player("joslong"),
-      new Player("joslonger"),
-      new Player("mediumyy")
-    ];
+  constructor(localUsername, socket) {
+    this.socket = socket;
+    this.localUsername = localUsername;
+
+    this.gamestate = {
+      players: []
+    };
+
+    this.socket.on('SetGameState', state => {
+      this.gamestate = state;
+    });
+
+    this.socket.on('SetMetaState', data => {
+      const stateName = data.stateName;
+
+      if (stateName == 'AfterMinigame') {
+        this.SetState(new AfterMinigame(this));
+      } else if (stateName == 'BeforeMinigame') {
+        this.SetState(new BeforeMinigame(this));
+      }
+    });
+
+    this.socket.on('SetMinigame', data => {
+      let minigame = null;
+      if (data.minigameName == 'ReactionMinigame') {
+        minigame = new ReactionMinigame(this, data.key, data.revealFrame);
+      } else if (data.minigameName == 'TyperaceMinigame') {
+        minigame = new TyperaceMinigame(this, data.text)
+      }
+
+      this.SetState(
+        new EnteringMinigame(this, data.roundNumber, minigame)
+      );
+    });
   }
 
   Start() {
@@ -54,20 +80,24 @@ const Game = class {
         this.minigame = null;
         this.SetState(new BeforeConnect(this));
 
-        setTimeout(() => {
-          // this.SetState(new EnteringMinigame(this, new TyperaceMinigame(this, "Both ways set out from the senses and particulars, and rest in the highest generalities.")));
-          this.SetState(new EnteringMinigame(this, new ReactionMinigame(this, "y", 500)));
-        }, 1500);
-
-        setTimeout(() => {
-          this.SetState(new AfterMinigame(this));
-        }, 30000);
+        this.game.stage.disableVisibilityChange = true;
       },
 
       update: () => {
         this.Tick();
       }
     });
+  }
+
+  SetMinigameState(minigameState) {
+    // insert into our own player
+    for (const player of this.gamestate.players) {
+      if (player.username == this.localUsername) {
+        player.minigameState = minigameState;
+      }
+    }
+
+    this.socket.emit('SetMinigameState', minigameState);
   }
 
   PrepareStage() {
@@ -176,5 +206,22 @@ const Game = class {
   }
 };
 
-window.game = new Game();
-window.game.Start();
+// connect to the server with the game id
+(() => {
+  const socket = io.connect("http://localhost:8000/");
+
+  var p = new URLSearchParams(document.location.search);
+  const username = p.get('username');
+  const gameId = p.get('gameId');
+
+  socket.on('connect', () => {
+    if (username && gameId) {
+      socket.emit('joinGame', { username, gameId });
+    }
+  });
+
+  socket.on('JoinedGame', () => {
+    window.game = new Game(username, socket);
+    window.game.Start();
+  });
+})();

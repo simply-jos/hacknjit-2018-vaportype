@@ -5,7 +5,6 @@ const TyperaceMinigame = class extends Minigame {
     this.frame = 0;
     this.text = text;
     this.localTypedText = '';
-    this.localProgress = 0;
   }
 
   Init() {
@@ -53,7 +52,7 @@ const TyperaceMinigame = class extends Minigame {
   Tick() {
     this.frame++;
 
-    if (this.frame < 80) {
+    if (this.frame < 105) {
       if (this.frame % 70 < 35) {
         this.instructionsLabel.alpha = 0;
       } else {
@@ -96,7 +95,6 @@ const TyperaceMinigame = class extends Minigame {
       nonMatchingEndPos = matchingEndPos + charsWrong;
     }
 
-    this.localProgress = numMatching / this.text.length;
 
     if (this.textLabel) this.textLabel.destroy();
 
@@ -115,12 +113,21 @@ const TyperaceMinigame = class extends Minigame {
       this.textLabel.addColor('#fff', nonMatchingEndPos);
     }
 
+    // We typed something, notify server of our progress and inject into our own
+    if (this.game.input.GetInputString().length > 0) {
+      this.game.SetMinigameState({
+        progress: numMatching / this.text.length
+      });
+    }
+
     for (let i=0;i<4;++i) {
-      let progressText = `${this.game.players[i].username}: [`;
+      let minigameState = this.game.gamestate.players[i].minigameState;
+      let playerProgress = minigameState.progress || 0;
+
+      let progressText = `${this.game.gamestate.players[i].username}: [`;
 
       for (let j=0;j<25;++j) {
-        // TODO: player progress
-        if (j < this.localProgress * 25) {
+        if (j < playerProgress * 25) {
           progressText += '=';
         } else {
           progressText += ' ';

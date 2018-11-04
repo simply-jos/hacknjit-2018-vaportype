@@ -64,6 +64,7 @@ const ReactionMinigame = class extends Minigame {
 
     this.instructionsLabel.destroy();
     this.textLabel.destroy();
+    this.coolGuyLabel.destroy();
   }
 
   Start() {
@@ -75,7 +76,7 @@ const ReactionMinigame = class extends Minigame {
   Tick() {
     this.frame++;
 
-    if (this.frame < 80) {
+    if (this.frame < 105) {
       if (this.frame % 70 < 35) {
         this.instructionsLabel.alpha = 0;
       } else {
@@ -104,7 +105,7 @@ const ReactionMinigame = class extends Minigame {
     }
     
     for (let i=0;i<4;++i) {
-      let text = `${this.game.players[i].username}: `;
+      let text = `${this.game.gamestate.players[i].username}: `;
 
       const offset = text.length;
       if (this.localTried) {

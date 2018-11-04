@@ -51,8 +51,8 @@ const BeforeConnect = class extends State {
     }
 
     for (let i=0;i<4;++i) {
-      if (i < this.game.players.length && this.game.players[i])
-        this.playerLabels[i].text = `${this.game.players[i].username}`;
+      if (i < this.game.gamestate.players.length && this.game.gamestate.players[i])
+        this.playerLabels[i].text = `${this.game.gamestate.players[i].username}`;
       else
         this.playerLabels[i].text = `-`;
     }

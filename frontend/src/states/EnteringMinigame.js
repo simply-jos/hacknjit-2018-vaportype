@@ -1,23 +1,26 @@
 const EnteringMinigame = class extends State {
-  constructor(game, minigame) {
+  constructor(game, roundNumber, minigame) {
     super(game);
 
+    this.roundNumber = roundNumber;
     this.minigame = minigame;
     this.frame = 0;
   }
 
   Init() {
     this.roundLabel = this.game.game.add.text(
-      0, 0, "ROUND 1", { fill: "#fff", boundsAlignH: "center" }
+      0, 0, "", { fill: "#fff", boundsAlignH: "center" }
     );
     MoveTextScaled(this.roundLabel, 0, 200, 1000, 100, 4);
     this.roundLabel.alpha = 0;
+    this.roundLabel.text = `ROUND ${this.roundNumber}`;
 
     this.playLabel = this.game.game.add.text(
-      0, 0, ">> PLAY >>", { fill: "#fff", boundsAlignH: "center" }
+      0, 0, "", { fill: "#fff", boundsAlignH: "center" }
     );
     MoveTextScaled(this.playLabel, 0, 260, 1000, 100, 3.5);
     this.playLabel.alpha = 0;
+    this.playLabel.text = '>> PLAY >>';
   }
 
   Start() {
@@ -62,8 +65,7 @@ const EnteringMinigame = class extends State {
     this.roundLabel.mask = this.game.backgroundMask;
 
     // TODO: fast test
-    // if (this.frame == 230) {
-    if (this.frame == 1) {
+    if (this.frame == 230) {
       this.game.SetState(new DuringMinigame(this.game, this.minigame));
     }
   }
