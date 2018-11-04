@@ -75,7 +75,7 @@ exports.Game = class {
 
         return true;
       }
-    } else if (this.minigameMetadata.minigameName == 'TyperaceMinigame' || this.minigameMetadata.minigameName == 'SpeedWordMinigame') {
+    } else if (this.minigameMetadata.minigameName == 'TyperaceMinigame') {
       // last player to finish gets hit
       const unfinished = [];
       for (const player of this.players) {
@@ -233,7 +233,7 @@ exports.Game = class {
 
       this.SetCurrentMinigame({
         roundNumber: this.roundNumber,
-        minigameName: 'SpeedWordMinigame',
+        minigameName: 'TyperaceMinigame',
         text: phrase
       });
     } else if (random == 4) {
