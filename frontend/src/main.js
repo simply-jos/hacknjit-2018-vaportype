@@ -55,7 +55,8 @@ const Game = class {
         this.SetState(new BeforeConnect(this));
 
         setTimeout(() => {
-          this.SetState(new EnteringMinigame(this, new TyperaceMinigame(this, "Both ways set out from the senses and particulars, and rest in the highest generalities.")));
+          // this.SetState(new EnteringMinigame(this, new TyperaceMinigame(this, "Both ways set out from the senses and particulars, and rest in the highest generalities.")));
+          this.SetState(new EnteringMinigame(this, new ReactionMinigame(this, "y", 500)));
         }, 1500);
 
         setTimeout(() => {
