@@ -1,16 +1,46 @@
 <html>
   <head>
-    <style type="stylesheet">
-      #game_dev {
-        margin-left: auto;
-        margin-right: auto;
-      }
-    </style>
+    <link rel="stylesheet" type = "text/css" href = "/assets/css/style.css">
   </head>
-  <body>
-    <div id="game_div" />
+  <body style="margin: 0; padding: 0; background-color: #000; text-align: center;">
+    <div id="game_holder_holder" style="
+      position: relative;
 
+      top: 100px;
+      left: 100px;
+    " >
+      <div id="game_holder" style="
+        transform-origin: 50% 50%;
+
+        position: absolute;
+        margin: 0;
+        padding: 0;
+    
+        width: 1280px;
+        height: 720px;
+    
+        top: 0;
+        left: 0;
+    
+        overflow: visible;
+      ">
+        <div id="game_div" />
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js.map"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
-    <script type="text/javascript" src="./src/main.js"></script>
+
+    <script type="text/javascript" src="/src/GameInput.js"></script>
+    <script type="text/javascript" src="/src/Player.js"></script>
+
+    <script type="text/javascript" src="/src/states/State.js"></script>
+    <script type="text/javascript" src="/src/states/BeforeConnect.js"></script>
+    <script type="text/javascript" src="/src/states/BeforeMinigame.js"></script>
+    <script type="text/javascript" src="/src/states/EnteringMinigame.js"></script>
+    <script type="text/javascript" src="/src/states/DuringMinigame.js"></script>
+    <script type="text/javascript" src="/src/states/AfterMinigame.js"></script>
+
+    <script type="text/javascript" src="/src/main.js"></script>
   </body>
 </html>
