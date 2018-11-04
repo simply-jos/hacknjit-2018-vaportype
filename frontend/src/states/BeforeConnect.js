@@ -18,7 +18,7 @@ const BeforeConnect = class extends State {
     const textWidth = fullWidth / 4;
     for (let i=0;i<4;++i) {
       const x = margin + textWidth * i;
-      const y = 300;
+      const y = 275;
 
       const label = this.game.game.add.text(
         0, 0, "", { font: "vcr", fill: "#fff", boundsAlignH: "center" }
