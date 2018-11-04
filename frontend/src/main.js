@@ -4,6 +4,7 @@ function ResizeHandler() {
   // Scale to fit window, maintain aspect ratio
   // to smallest dimension
   let menu = document.getElementById("game_holder");
+  let menuOutline = document.getElementById("game_holder_outline");
 
   if (!menu) {
     return;
@@ -13,47 +14,32 @@ function ResizeHandler() {
   const innerHeight = window.innerHeight - extraMargin * 2;
   const innerWidth = window.innerWidth - extraMargin * 2;
 
-  let scale = innerHeight / 720;
-  if (1280 * scale > innerWidth) {
-    scale = innerWidth / 1280;
+  let scale = 0;
+  if (innerWidth < innerHeight) {
+    scale = innerWidth / 1000;
+  } else {
+    scale = innerHeight / 1000;
   }
 
   menu.style.zoom = `${scale * 100}%`;
-
-  if (innerWidth > 1280 * scale) {
-    menu.style.left = `${(innerWidth - 1280 * scale) / 2}px`;
-    menu.style.top = '0px';
-  } else if (innerHeight > 720 * scale) {
-    menu.style.left = '0px';
-    menu.style.top = `${(innerHeight - 720 * scale) / 2}px`;
-  }
 }
 
 window.onresize = ResizeHandler;
 
 ResizeHandler();
 
-const State = {
-  BEFORE_CONNECT: 0,
-
-  BEFORE_MINIGAME: 1,
-  ENTERING_MINIGAME: 2,
-  IN_MINIGAME: 3,
-  AFTER_MINIGAME: 4
-};
-
 const Game = class {
   constructor() {
     this.players = [
-      new Player('jos'),
-      new Player('toaster'),
-      new Player('otters'),
-      new Player('puke')
+      new Player('jos1'),
+      new Player('jos2'),
+      new Player('jos3'),
+      new Player('jos4')
     ];
   }
 
   Start() {
-    this.game = new Phaser.Game(1280, 720, Phaser.CANVAS, 'game_div', {
+    this.game = new Phaser.Game(1000, 1000, Phaser.CANVAS, 'game_holder', {
       preload: () => {
         this.game.load.video('background_vid', '/assets/videos/background.mp4');
       },
@@ -64,10 +50,17 @@ const Game = class {
         this.input = new GameInput(this.game);
 
         this.frame = 0;
-        this.stateFrame = 0;
         this.minigameTransitProgress = 0;
-        this.state = State.BEFORE_MINIGAME;
         this.minigame = null;
+        this.SetState(new BeforeConnect(this));
+
+        setTimeout(() => {
+          this.SetState(new EnteringMinigame(this));
+        }, 3500)
+
+        setTimeout(() => {
+          this.SetState(new AfterMinigame(this));
+        }, 8500)
       },
 
       update: () => {
@@ -83,50 +76,34 @@ const Game = class {
     this.backgroundVideo.alpha = 0;
     this.backgroundVideo.play(true);
 
-    this.backgroundSprite = this.game.add.sprite(0, 0);
+    this.backgroundSprite = this.game.add.sprite(-250, 135);
+    this.backgroundSprite.scale = new Phaser.Point(1.2, 1.2);
     this.backgroundVideo.add(this.backgroundSprite);
 
     this.backgroundSprite.alpha = 0;
     this.game.add.tween(this.backgroundSprite)
       .to({ alpha: 1 }, 1000, Phaser.Easing.Linear.None, true);
-
-    this.playText = this.game.add.text(80, 65, "PLAY >>", { font: "vcr", fill: "#fff"});
-    this.playText.scale = new Phaser.Point(5.0, 5.0);
   }
 
   SetState(newState) {
-    this.stateFrame = 0;
+    if (this.state) {
+      this.state.End();
+    }
+
     this.state = newState;
+    this.state.Init();
+    this.state.Start();
   }
 
   Tick() {
+    if (!this.state) return;
+
     this.input.CalculateInputString();
     this.DrawMinigameTransition();
 
-    if (this.state == State.BEFORE_CONNECT) {
-      // Not connected
-    } else if (this.state == State.BEFORE_MINIGAME) {
-    } else if (this.state == State.ENTERING_MINIGAME) {
-    } else if (this.state == State.IN_MINIGAME) {
-      if (this.minigame) {
-        this.minigame.Tick();
-      }
-    } else if (this.state == State.AFTER_MINIGAME) {
-    }
+    this.state.Tick();
 
     this.frame++;
-    this.stateFrame++;
-
-    // Draw the PLAY icon
-    if (this.state == State.ENTERING_MINIGAME || this.state == State.IN_MINIGAME) {
-      if (this.stateFrame % 70 < 35) {
-        this.playText.alpha = 0;
-      } else {
-        this.playText.alpha = 1;
-      }
-    } else {
-      this.playText.alpha = 0;
-    }
   }
 
   DrawMinigameTransition() {
@@ -135,20 +112,23 @@ const Game = class {
     }
 
     let transitDirection = 1;
-    if (!this.minigame) {
+    if (!(this.state instanceof DuringMinigame)) {
       transitDirection = -1;
     }
 
     const midPoint = [
-      1280 / 2,
-      720 / 2
+      1000 / 2,
+      1000 / 2
     ];
 
     this.minigameTransitProgress += 0.025 * transitDirection;
+    this.minigameTransitProgress = Math.max(
+      Math.min(1, this.minigameTransitProgress), 0
+    );
     const transitProgress = Math.ceil(this.minigameTransitProgress * 8) / 8;
 
-    const width = transitProgress * 1280;
-    const height = transitProgress * 720;
+    const width = transitProgress * 1000;
+    const height = transitProgress * 1000;
 
     const topLeft = [ midPoint[0] - width / 2, midPoint[1] - height / 2 ];
     const bottomRight = [ midPoint[0] + width / 2, midPoint[1] + height / 2 ];
@@ -159,29 +139,28 @@ const Game = class {
     // Top
     this.backgroundMask.drawRect(
       0, 0,
-      1280, topLeft[1]
+      1000, topLeft[1]
     );
 
     // Bottom
     this.backgroundMask.drawRect(
       0, bottomRight[1],
-      1280, 9999
+      1000, 9999
     );
 
     // Left
     this.backgroundMask.drawRect(
       0, 0,
-      topLeft[0], 720
+      topLeft[0], 1000
     );
 
     // Right
     this.backgroundMask.drawRect(
       bottomRight[0], 0,
-      9999, 720
+      9999, 1000
     );
 
     this.backgroundSprite.mask = this.backgroundMask;
-    this.playText.mask = this.backgroundMask;
   }
 };
 

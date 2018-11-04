@@ -3,33 +3,27 @@
     <link rel="stylesheet" type = "text/css" href = "/assets/css/style.css">
   </head>
   <body style="margin: 0; padding: 0; background-color: #000; text-align: center;">
-    <div id="game_holder_holder" style="
-      position: relative;
+    <div id="game_holder" style="
+      transform: translateX(-50%) translateY(-50%);
 
-      top: 100px;
-      left: 100px;
-    " >
-      <div id="game_holder" style="
-        transform-origin: 50% 50%;
+      position: absolute;
+      margin: 0;
+      padding: 0;
+  
+      width: 1000px;
+      height: 1000px;
+  
+      top: 50%;
+      left: 50%;
 
-        position: absolute;
-        margin: 0;
-        padding: 0;
-    
-        width: 1280px;
-        height: 720px;
-    
-        top: 0;
-        left: 0;
-    
-        overflow: visible;
-      ">
-        <div id="game_div" />
-      </div>
+      outline: 2px solid #fff;
+    ">
     </div>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js.map"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+
+    <script type="text/javascript" src="/src/Util.js"></script>
 
     <script type="text/javascript" src="/src/GameInput.js"></script>
     <script type="text/javascript" src="/src/Player.js"></script>
