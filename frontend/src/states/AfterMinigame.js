@@ -68,7 +68,10 @@ const AfterMinigame = class extends State {
       this.playerLabels[i].text = `${this.game.gamestate.players[i].username}`;
       this.playerLabels[i].mask = this.game.backgroundMask;
 
-      this.scoreLabels[i].text = `X`;
+      this.scoreLabels[i].text += '';
+      for (let j=0;j<this.game.gamestate.players[i].strikes;++j) {
+        this.scoreLabels[i].text += 'X';
+      }
       this.scoreLabels[i].mask = this.game.backgroundMask;
     }
 

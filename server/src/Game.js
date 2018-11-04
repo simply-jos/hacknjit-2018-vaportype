@@ -12,6 +12,16 @@ const Player = class {
     this.minigameState = {};
   }
 
+  Hurt() {
+    this.strikes++;
+
+    if (this.strikes == 3) {
+      this.alive = false;
+
+      this.sock.emit('YouAreDead', {});
+    }
+  }
+
   GetState() {
     return {
       username: this.username,
@@ -26,6 +36,8 @@ exports.Game = class {
   constructor() {
     this.players = [];
     this.roundNumber = 1;
+
+    this.minigameResolver = null;
   }
 
   StartGame() {
@@ -36,12 +48,45 @@ exports.Game = class {
     this.GameLoop();
   }
 
+  SetCurrentMinigame(metadata) {
+    this.minigameMetadata = metadata;
+    this.Send('SetMinigame', metadata);
+  }
+
+  MinigameWinConditionMet() {
+    if (this.minigameMetadata.minigameName == 'ReactionMinigame') {
+      // last player to react gets hit
+    } else if (this.minigameMetadata.minigameName == 'TyperaceMinigame') {
+      // last player to finish gets hit
+      const unfinished = [];
+      for (const player of this.players) {
+        if (player.minigameState.progress != 1) {
+          unfinished.push(player);
+        }
+      }
+
+      // this guy sucked
+      if (unfinished.length == 1) {
+        unfinished[0].Hurt();
+
+        return true;
+      }
+      
+      // nobody sucked?? wtf
+      if (unfinished.length == 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   async PlayRandomMinigame() {
     const random = randomIntFromInterval(0, 1);
 
     // Reset all players minigame state
     for (const player of this.players) {
-      player.mnigameState = {};
+      player.minigameState = {};
     }
 
     this.SendGameState();
@@ -53,12 +98,12 @@ exports.Game = class {
         return letter
       }
 
-      this.Send('SetMinigame', {
+      this.SetCurrentMinigame({
         roundNumber: this.roundNumber,
         minigameName: 'ReactionMinigame',
         key: randLetter(),
         revealFrame: randomIntFromInterval(250, 600)
-      });
+      })
     } else if (random == 1) {
       const phrases = [
         `After you've done a thing the same way for two years, look it over carefully.`,
@@ -73,7 +118,7 @@ exports.Game = class {
 
       const phrase = phrases[randomIntFromInterval(0, 7)];
 
-      this.Send('SetMinigame', {
+      this.SetCurrentMinigame({
         roundNumber: this.roundNumber,
         minigameName: 'TyperaceMinigame',
         text: phrase
@@ -87,13 +132,19 @@ exports.Game = class {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Select a new minigame
+      const minigamePromise = new Promise(resolve => { this.minigameResolver = resolve; });
       await this.PlayRandomMinigame();
 
       // Increment round number
       this.roundNumber++;
 
-      // Wait a bit
-      await new Promise(resolve => {});
+      // Wait until minigame is finished
+      await minigamePromise;
+
+      // Display results
+      this.Send('SetMetaState', {
+        stateName: 'AfterMinigame'
+      });
     }
   }
 
@@ -109,6 +160,12 @@ exports.Game = class {
     player.sock.on('SetMinigameState', minigameState => {
       player.minigameState = minigameState;
       this.SendGameState();
+
+      if (this.MinigameWinConditionMet()) {
+        if (this.minigameResolver) this.minigameResolver();
+
+        this.minigameResolver = null;
+      }
     });
 
     player.sock.emit('JoinedGame', {});

@@ -100,24 +100,27 @@ const ReactionMinigame = class extends Minigame {
       if (input.length > 0) {
         this.localTried = true;
 
-        this.localState = input[0];
+        this.game.SetMinigameState({
+          guess: input[0]
+        });
       }
     }
     
     for (let i=0;i<4;++i) {
+      const minigameState = this.game.gamestate.players[i].minigameState;
       let text = `${this.game.gamestate.players[i].username}: `;
 
       const offset = text.length;
-      if (this.localTried) {
-        text += ` ${this.localState} `;
+      if (minigameState.guess) {
+        text += ` ${minigameState.guess} `;
       }  else {
         text += '...';
       }
 
       this.playerProgressLabels[i].text = text;
 
-      if (this.localTried) {
-        if (this.localState == this.key) {
+      if (minigameState.guess) {
+        if (minigameState.guess == this.key) {
           this.playerProgressLabels[i].addColor('#0f0', offset);
         } else {
           this.playerProgressLabels[i].addColor('#f00', offset);

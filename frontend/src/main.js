@@ -31,10 +31,15 @@ const Game = class {
   constructor(localUsername, socket) {
     this.socket = socket;
     this.localUsername = localUsername;
+    this.dead = false;
 
     this.gamestate = {
       players: []
     };
+
+    this.socket.on('YouAreDead', () => {
+      this.dead = true;
+    })
 
     this.socket.on('SetGameState', state => {
       this.gamestate = state;
@@ -51,6 +56,11 @@ const Game = class {
     });
 
     this.socket.on('SetMinigame', data => {
+      // reset all players minigame state
+      for (const player of this.gamestate.players) {
+        player.minigameState = {};
+      }
+
       let minigame = null;
       if (data.minigameName == 'ReactionMinigame') {
         minigame = new ReactionMinigame(this, data.key, data.revealFrame);
@@ -128,6 +138,7 @@ const Game = class {
   }
 
   Tick() {
+    if (this.dead) return;
     if (!this.state) return;
     this.backgroundVideo.mute = true;
 

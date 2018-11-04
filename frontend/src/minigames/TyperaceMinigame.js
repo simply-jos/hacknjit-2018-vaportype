@@ -102,7 +102,6 @@ const TyperaceMinigame = class extends Minigame {
       0, 0, this.text, { fill: "#fff", boundsAlignH: "ceter", wordWrap: true, wordWrapWidth: 800 }
     );
     MoveTextScaled(this.textLabel, 100, 300, 800, 300, 5);
-    this.textLabel.mask = this.game.invertedBackgroundMask;
     this.textLabel.lineSpacing = -5;
 
     this.textLabel.addColor('#0f0', 0);
@@ -112,6 +111,8 @@ const TyperaceMinigame = class extends Minigame {
       this.textLabel.addColor('#f00', nonMatchingStartPos);
       this.textLabel.addColor('#fff', nonMatchingEndPos);
     }
+
+    this.textLabel.mask = this.game.invertedBackgroundMask;
 
     // We typed something, notify server of our progress and inject into our own
     if (this.game.input.GetInputString().length > 0) {
@@ -137,6 +138,7 @@ const TyperaceMinigame = class extends Minigame {
       progressText += ']';
 
       this.playerProgressLabels[i].text = progressText;
+      this.playerProgressLabels[i].mask = this.game.invertedBackgroundMask;
     }
   }
 }
