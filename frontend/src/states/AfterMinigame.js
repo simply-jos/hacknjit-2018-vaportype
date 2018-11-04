@@ -15,6 +15,10 @@ const AfterMinigame = class extends State {
     MoveTextScaled(this.resultsLabel, 0, 200, 1000, 100, 4);
     this.resultsLabel.text = 'RESULTS';
 
+    if (this.game.IsLocalPlayerDead()) {
+      this.resultsLabel.text = 'YOU WERE ELIMINATED';
+    }
+
     this.playerLabels = [];
     this.scoreLabels = [];
 

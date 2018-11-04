@@ -104,6 +104,17 @@ const Game = class {
     });
   }
 
+  IsLocalPlayerDead() {
+    // insert into our own player
+    for (const player of this.gamestate.players) {
+      if (player.username == this.localUsername) {
+        if (!player.alive) return true
+      }
+    }
+
+    return false;
+  }
+
   SetMinigameState(minigameState) {
     // insert into our own player
     for (const player of this.gamestate.players) {
