@@ -243,7 +243,7 @@ const Game = class {
 
 // connect to the server with the game id
 (() => {
-  const socket = io.connect("http://localhost:8000/");
+  const socket = io.connect(`http://${window.location.hostname}:8000/`);
 
   var p = new URLSearchParams(document.location.search);
   const username = p.get('username');
