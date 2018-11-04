@@ -166,8 +166,6 @@ exports.Game = class {
         stateName: 'AfterMinigame'
       });
 
-      console.log(this.players.map(p => p.strikes));
-
       // Wait a bit
       await new Promise(resolve => setTimeout(resolve, 2000));
 

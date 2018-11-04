@@ -19,7 +19,8 @@ const AfterMinigame = class extends State {
       this.resultsLabel.text = 'YOU WERE ELIMINATED';
     }
 
-    if (this.game.IsLocalPlayerWinner()) {
+    this.winScreen = this.game.IsLocalPlayerWinner();
+    if (this.winScreen) {
       this.resultsLabel.text = 'YOU WON!!';
     }
 
@@ -100,7 +101,7 @@ const AfterMinigame = class extends State {
 
     this.resultsLabel.mask = this.game.backgroundMask;
 
-    if (this.frame == 200) {
+    if (this.frame == 200 && this.winScreen) {
       this.game.SetState(new BeforeMinigame(this.game));
     }
   }
