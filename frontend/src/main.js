@@ -32,11 +32,16 @@ const Game = class {
     this.socket = socket;
     this.localUsername = localUsername;
     this.dead = false;
+    this.isWinner = false;
     this.nextHighlightHurt = [];
 
     this.gamestate = {
       players: []
     };
+
+    this.socket.on('NotifyWin', data => {
+      this.isWinner = true;
+    });
 
     this.socket.on('NotifyHurt', data => {
       this.nextHighlightHurt.push(data.playerName);
@@ -73,6 +78,10 @@ const Game = class {
         minigame = new TyperaceMinigame(this, data.text);
       } else if (data.minigameName == 'MathMinigame') {
         minigame = new MathMinigame(this, data.a, data.b, data.op, data.result);
+      } else if (data.minigameName == 'SpeedWordMinigame') {
+        minigame = new SpeedWordMinigame(this, data.text);
+      } else if (data.minigameName == 'GuitarHeroMinigame') {
+        minigame = new GuitarHeroMinigame(this, data.keys, data.sequence);
       }
 
       this.SetState(
@@ -107,28 +116,11 @@ const Game = class {
   }
 
   IsLocalPlayerWinner() {
-    // check if at least 3 are dead, trust me, this will always work lmao
-    let numDead = 0;
-    for (const player of this.gamestate.players) {
-      if (!player.alive) {
-        numDead++;
-      }
-    }
-
-    if (numDead >= 3) {
-      return true;
-    }
+    return this.isWinner;
   }
 
   IsLocalPlayerDead() {
-    // insert into our own player
-    for (const player of this.gamestate.players) {
-      if (player.username == this.localUsername) {
-        if (!player.alive) return true
-      }
-    }
-
-    return false;
+    return this.dead;
   }
 
   SetMinigameState(minigameState) {

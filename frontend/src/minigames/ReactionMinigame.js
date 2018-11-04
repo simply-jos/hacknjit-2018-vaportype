@@ -105,7 +105,7 @@ const ReactionMinigame = class extends Minigame {
       }
     }
     
-    for (let i=0;i<4;++i) {
+    for (let i=0;i<this.game.gamestate.players.length;++i) {
       if (!this.game.gamestate.players[i].alive) continue;
 
       const minigameState = this.game.gamestate.players[i].minigameState;

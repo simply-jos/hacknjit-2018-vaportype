@@ -50,7 +50,7 @@ const BeforeConnect = class extends State {
       this.waitingLabel.alpha = 1;
     }
 
-    for (let i=0;i<4;++i) {
+    for (let i=0;i<this.game.gamestate.players.length;++i) {
       if (i < this.game.gamestate.players.length && this.game.gamestate.players[i])
         this.playerLabels[i].text = `${this.game.gamestate.players[i].username}`;
       else

@@ -75,7 +75,7 @@ exports.Game = class {
 
         return true;
       }
-    } else if (this.minigameMetadata.minigameName == 'TyperaceMinigame') {
+    } else if (this.minigameMetadata.minigameName == 'TyperaceMinigame' || this.minigameMetadata.minigameName == 'SpeedWordMinigame') {
       // last player to finish gets hit
       const unfinished = [];
       for (const player of this.players) {
@@ -115,13 +115,41 @@ exports.Game = class {
       if (unfinished.length == 0) {
         return true;
       }
+    } else if (this.minigameMetadata.minigameName == 'GuitarHeroMinigame') {
+      // if all players are done
+      const unfinished = [];
+      for (const player of this.players) {
+        if (!player.minigameState.finished && player.alive) {
+          unfinished.push(player);
+        }
+      }
+
+      if (unfinished.length == 0) {
+        // Hurt everyone except the best player
+        let highestScore = -999;
+        for (const player of this.players) {
+          const score = player.minigameState.hits - player.minigameState.mistakes;
+          if (score > highestScore) {
+            highestScore = score;
+          }
+        }
+
+        for (const player of this.players) {
+          const score = player.minigameState.hits - player.minigameState.mistakes;
+          if (score < highestScore) {
+            player.Hurt();
+          }
+        }
+
+        return true;
+      }
     }
 
     return false;
   }
 
   async PlayRandomMinigame() {
-    const random = 2; //randomIntFromInterval(0, 2);
+    const random = 4; // randomIntFromInterval(0, 3);
 
     // Reset all players minigame state
     for (const player of this.players) {
@@ -189,6 +217,52 @@ exports.Game = class {
         minigameName: 'MathMinigame',
         a, b, op, result
       });
+    } else if (random == 3) {
+      const phrases = [
+        `cat`,
+        `cargo`,
+        `keyboard`,
+        `paper`,
+        `office`,
+        `cheese`,
+        `wheels`,
+        `assignment`
+      ];
+
+      const phrase = phrases[randomIntFromInterval(0, 7)];
+
+      this.SetCurrentMinigame({
+        roundNumber: this.roundNumber,
+        minigameName: 'SpeedWordMinigame',
+        text: phrase
+      });
+    } else if (random == 4) {
+      let letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+      let keys = [];
+      while (keys.length < 4) {
+        let idx = Math.floor(Math.random() * letters.length);
+        keys.push(letters[idx]);
+        letters.splice(idx, 1);
+      }
+
+      let sequence = [];
+      for (let i=0;i<4;++i) sequence.push([]);
+
+      let numNotes = 50;
+      let x = 0;
+      while (numNotes > 0) {
+        x += 5 + Math.random() * 20;
+        sequence[Math.floor(Math.random() * 4)].push(x);
+
+        numNotes--;
+      }
+
+      this.SetCurrentMinigame({
+        roundNumber: this.roundNumber,
+        minigameName: 'GuitarHeroMinigame',
+        keys,
+        sequence
+      });
     }
   }
 
@@ -227,6 +301,12 @@ exports.Game = class {
         break;
       }
     }
+
+    for (const player of this.players) {
+      if (player.alive) {
+        player.sock.emit('NotifyWin', {});
+      }
+    }
   }
 
   AddPlayer(username, sock) {
@@ -250,10 +330,11 @@ exports.Game = class {
 
       this.SendGameState();
 
-      if (this.MinigameWinConditionMet()) {
-        if (this.minigameResolver) this.minigameResolver();
-
-        this.minigameResolver = null;
+      if (this.minigameResolver) {
+        if (this.MinigameWinConditionMet()) {
+          this.minigameResolver();
+          this.minigameResolver = null;
+        }
       }
     });
 

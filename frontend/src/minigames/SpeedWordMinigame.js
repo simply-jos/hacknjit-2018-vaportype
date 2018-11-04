@@ -1,4 +1,4 @@
-const TyperaceMinigame = class extends Minigame {
+const SpeedTypeMinigame = class extends Minigame {
   constructor(game, text) {
     super(game);
 
@@ -14,7 +14,7 @@ const TyperaceMinigame = class extends Minigame {
       0, 0, "", { fill: "#fff", boundsAlignH: "center" }
     );
     MoveTextScaled(this.instructionsLabel, 0, 200, 1000, 100, 4);
-    this.instructionsLabel.text = ">> TYPERACE >>"
+    this.instructionsLabel.text = ">> SPEED WORD >>"
     this.instructionsLabel.mask = this.game.invertedBackgroundMask;
 
     this.playerProgressLabels = [];
@@ -106,7 +106,7 @@ const TyperaceMinigame = class extends Minigame {
     if (this.textLabel) this.textLabel.destroy();
 
     this.textLabel = this.game.game.add.text(
-      0, 0, this.text, { fill: "#fff", boundsAlignH: "ceter", wordWrap: true, wordWrapWidth: 800 }
+      0, 0, this.text, { fill: "#fff", boundsAlignH: "center", wordWrap: true, wordWrapWidth: 800 }
     );
     MoveTextScaled(this.textLabel, 100, 300, 800, 300, 5);
     this.textLabel.lineSpacing = -5;
