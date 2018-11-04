@@ -31,10 +31,10 @@ ResizeHandler();
 const Game = class {
   constructor() {
     this.players = [
-      new Player('jos1'),
-      new Player('jos2'),
-      new Player('jos3'),
-      new Player('jos4')
+      new Player("jos"),
+      new Player("joslong"),
+      new Player("joslonger"),
+      new Player("mediumyy")
     ];
   }
 
@@ -55,12 +55,12 @@ const Game = class {
         this.SetState(new BeforeConnect(this));
 
         setTimeout(() => {
-          this.SetState(new EnteringMinigame(this));
-        }, 3500)
+          this.SetState(new EnteringMinigame(this, new TyperaceMinigame(this, "Both ways set out from the senses and particulars, and rest in the highest generalities.")));
+        }, 1500);
 
         setTimeout(() => {
           this.SetState(new AfterMinigame(this));
-        }, 8500)
+        }, 30000);
       },
 
       update: () => {
@@ -74,6 +74,7 @@ const Game = class {
     this.backgroundVideo = this.game.add.video('background_vid');
 
     this.backgroundVideo.alpha = 0;
+    this.backgroundVideo.mute = true;
     this.backgroundVideo.play(true);
 
     this.backgroundSprite = this.game.add.sprite(-250, 135);
@@ -97,6 +98,7 @@ const Game = class {
 
   Tick() {
     if (!this.state) return;
+    this.backgroundVideo.mute = true;
 
     this.input.CalculateInputString();
     this.DrawMinigameTransition();
@@ -135,6 +137,15 @@ const Game = class {
 
     this.backgroundMask = this.backgroundMask || this.game.add.graphics(0, 0);
     this.backgroundMask.clear();
+
+    this.invertedBackgroundMask = this.invertedBackgroundMask || this.game.add.graphics(0, 0);
+    this.invertedBackgroundMask.clear();
+    
+    // Inverted mask is just the rect from the center
+    this.invertedBackgroundMask.drawRect(
+      topLeft[0], topLeft[1],
+      bottomRight[0], bottomRight[1]
+    );
 
     // Top
     this.backgroundMask.drawRect(

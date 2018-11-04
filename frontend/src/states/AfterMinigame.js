@@ -6,10 +6,11 @@ const AfterMinigame = class extends State {
   }
 
   Init() {
-    this.waitingLabel = this.game.game.add.text(
-      0, 0, "RESULTS", { font: "vcr", fill: "#fff", boundsAlignH: "center" }
+    this.resultsLabel = this.game.game.add.text(
+      0, 0, '', { fill: "#fff", boundsAlignH: "center" }
     );
-    MoveTextScaled(this.waitingLabel, 0, 200, 1000, 100, 4);
+    MoveTextScaled(this.resultsLabel, 0, 200, 1000, 100, 4);
+    this.resultsLabel.text = 'RESULTS';
 
     this.playerLabels = [];
     this.scoreLabels = [];
@@ -23,7 +24,7 @@ const AfterMinigame = class extends State {
 
       {
         const label = this.game.game.add.text(
-          0, 0, "", { font: "vcr", fill: "#fff", boundsAlignH: "center" }
+          0, 0, "", { fill: "#fff", boundsAlignH: "center" }
         );
         MoveTextScaled(label, x, y, textWidth, 100, 3);
         this.playerLabels.push(label);
@@ -31,7 +32,7 @@ const AfterMinigame = class extends State {
 
       {
         const label = this.game.game.add.text(
-          0, 0, "", { font: "vcr", fill: "#f00", boundsAlignH: "center" }
+          0, 0, "", { fill: "#f00", boundsAlignH: "center" }
         );
         MoveTextScaled(label, x, y + 35, textWidth, 100, 3);
         this.scoreLabels.push(label);
@@ -51,16 +52,16 @@ const AfterMinigame = class extends State {
       label.destroy();
     }
 
-    this.waitingLabel.destroy();
+    this.resultsLabel.destroy();
   }
 
   Tick() {
     this.frame++;
 
     if (this.frame % 70 < 35) {
-      this.waitingLabel.alpha = 0;
+      this.resultsLabel.alpha = 0;
     } else {
-      this.waitingLabel.alpha = 1;
+      this.resultsLabel.alpha = 1;
     }
 
     for (let i=0;i<4;++i) {
@@ -71,7 +72,7 @@ const AfterMinigame = class extends State {
       this.scoreLabels[i].mask = this.game.backgroundMask;
     }
 
-    this.waitingLabel.mask = this.game.backgroundMask;
+    this.resultsLabel.mask = this.game.backgroundMask;
 
     if (this.frame == 200) {
       this.game.SetState(new BeforeMinigame(this.game));

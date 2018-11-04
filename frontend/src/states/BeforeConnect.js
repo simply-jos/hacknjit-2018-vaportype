@@ -7,9 +7,10 @@ const BeforeConnect = class extends State {
 
   Init() {
     this.waitingLabel = this.game.game.add.text(
-      0, 0, "WAITING FOR PLAYERS", { font: "vcr", fill: "#fff", boundsAlignH: "center" }
+      0, 0, '', { fill: "#fff", boundsAlignH: "center" }
     );
     MoveTextScaled(this.waitingLabel, 0, 200, 1000, 100, 4);
+    this.waitingLabel.text = 'WAITING FOR PLAYERS';
 
     this.playerLabels = [];
 
@@ -21,7 +22,7 @@ const BeforeConnect = class extends State {
       const y = 275;
 
       const label = this.game.game.add.text(
-        0, 0, "", { font: "vcr", fill: "#fff", boundsAlignH: "center" }
+        0, 0, "", { fill: "#fff", boundsAlignH: "center" }
       );
       MoveTextScaled(label, x, y, textWidth, 100, 3);
 
@@ -50,7 +51,10 @@ const BeforeConnect = class extends State {
     }
 
     for (let i=0;i<4;++i) {
-      this.playerLabels[i].text = `${this.game.players[i].username}`;
+      if (i < this.game.players.length && this.game.players[i])
+        this.playerLabels[i].text = `${this.game.players[i].username}`;
+      else
+        this.playerLabels[i].text = `-`;
     }
   }
 }

@@ -3,6 +3,14 @@ const GameInput = class {
     this.inputStringAccumulator = '';
     this.inputString = '';
 
+    document.addEventListener("keydown", e => {
+      if (e.keyCode == 8) {
+        e.preventDefault()
+
+        this.inputStringAccumulator += '\b';
+      }
+    });
+
     game.input.keyboard.addCallbacks(this, null, null, c => {
       this.inputStringAccumulator += c;
     });

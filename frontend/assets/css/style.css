@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "vcr";
+  font-family: 'vcr';
   font-style: normal;
   font-weight: 400;
-  src: url("/assets/fonts/vct.ttf");
+  src: url('./vcr.ttf') format('truetype');
 }
