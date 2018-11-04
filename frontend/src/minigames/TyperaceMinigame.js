@@ -122,23 +122,30 @@ const TyperaceMinigame = class extends Minigame {
     }
 
     for (let i=0;i<4;++i) {
+      const alive = this.game.gamestate.players[i].alive;
       let minigameState = this.game.gamestate.players[i].minigameState;
       let playerProgress = minigameState.progress || 0;
 
-      let progressText = `${this.game.gamestate.players[i].username}: [`;
+      let progressText = `${this.game.gamestate.players[i].username}: `; //[`;
 
-      for (let j=0;j<25;++j) {
-        if (j < playerProgress * 25) {
-          progressText += '=';
-        } else {
-          progressText += ' ';
+      if (alive) {
+        progressText += '[';
+        for (let j = 0; j < 25; ++j) {
+          if (j < playerProgress * 25) {
+            progressText += '=';
+          } else {
+            progressText += ' ';
+          }
         }
+
+        progressText += ']';
+
+        this.playerProgressLabels[i].text = progressText;
+        this.playerProgressLabels[i].mask = this.game.invertedBackgroundMask;
+      } else {
+        progressText += '*ELIM*';
+        this.playerProgressLabels[i].setColor('#f00', 0);
       }
-
-      progressText += ']';
-
-      this.playerProgressLabels[i].text = progressText;
-      this.playerProgressLabels[i].mask = this.game.invertedBackgroundMask;
     }
   }
 }

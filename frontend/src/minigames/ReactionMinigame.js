@@ -1,9 +1,9 @@
 const ReactionMinigame = class extends Minigame {
-  constructor(game, key, revealFrame) {
+  constructor(game, letter, revealFrame) {
     super(game);
 
     this.frame = 0;
-    this.key = key;
+    this.letter = letter;
     this.revealFrame = revealFrame;
 
     this.localTried = false;
@@ -63,7 +63,6 @@ const ReactionMinigame = class extends Minigame {
     }
 
     this.instructionsLabel.destroy();
-    this.textLabel.destroy();
     this.coolGuyLabel.destroy();
   }
 
@@ -92,7 +91,7 @@ const ReactionMinigame = class extends Minigame {
     }
 
     if (this.frame > this.revealFrame) {
-      this.coolGuyLabel.text = `\nPRESS ${this.key.toUpperCase()} !`
+      this.coolGuyLabel.text = `\nPRESS ${this.letter.toUpperCase()} !`
     }
 
     const input = this.game.input.GetInputString();
@@ -107,24 +106,30 @@ const ReactionMinigame = class extends Minigame {
     }
     
     for (let i=0;i<4;++i) {
+      const alive = this.game.gamestate.players[i].alive;
       const minigameState = this.game.gamestate.players[i].minigameState;
       let text = `${this.game.gamestate.players[i].username}: `;
 
-      const offset = text.length;
-      if (minigameState.guess) {
-        text += ` ${minigameState.guess} `;
-      }  else {
-        text += '...';
-      }
-
-      this.playerProgressLabels[i].text = text;
-
-      if (minigameState.guess) {
-        if (minigameState.guess == this.key) {
-          this.playerProgressLabels[i].addColor('#0f0', offset);
+      if (alive) {
+        const offset = text.length;
+        if (minigameState.guess) {
+          text += ` ${minigameState.guess} `;
         } else {
-          this.playerProgressLabels[i].addColor('#f00', offset);
+          text += '...';
         }
+
+        this.playerProgressLabels[i].text = text;
+
+        if (minigameState.guess) {
+          if (minigameState.guess == this.letter) {
+            this.playerProgressLabels[i].addColor('#0f0', offset);
+          } else {
+            this.playerProgressLabels[i].addColor('#f00', offset);
+          }
+        }
+      } else {
+        text += '*ELIM*';
+        this.playerProgressLabels[i].addColor('#f00', 0);
       }
     }
   }

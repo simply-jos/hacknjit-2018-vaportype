@@ -32,10 +32,15 @@ const Game = class {
     this.socket = socket;
     this.localUsername = localUsername;
     this.dead = false;
+    this.nextHighlightHurt = [];
 
     this.gamestate = {
       players: []
     };
+
+    this.socket.on('NotifyHurt', data => {
+      this.nextHighlightHurt.push(data.playerName);
+    });
 
     this.socket.on('YouAreDead', () => {
       this.dead = true;
@@ -63,7 +68,7 @@ const Game = class {
 
       let minigame = null;
       if (data.minigameName == 'ReactionMinigame') {
-        minigame = new ReactionMinigame(this, data.key, data.revealFrame);
+        minigame = new ReactionMinigame(this, data.letter, data.revealFrame);
       } else if (data.minigameName == 'TyperaceMinigame') {
         minigame = new TyperaceMinigame(this, data.text)
       }
@@ -224,7 +229,7 @@ const Game = class {
   var p = new URLSearchParams(document.location.search);
   const username = p.get('username');
   const gameId = p.get('gameId');
-
+  
   socket.on('connect', () => {
     if (username && gameId) {
       socket.emit('joinGame', { username, gameId });

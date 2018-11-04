@@ -2,6 +2,9 @@ const AfterMinigame = class extends State {
   constructor(game) {
     super(game);
 
+    this.highlightHurt = game.nextHighlightHurt.slice();
+    game.nextHighlightHurt = [];
+
     this.frame = 0;
   }
 
@@ -68,7 +71,19 @@ const AfterMinigame = class extends State {
       this.playerLabels[i].text = `${this.game.gamestate.players[i].username}`;
       this.playerLabels[i].mask = this.game.backgroundMask;
 
-      this.scoreLabels[i].text += '';
+      if (!this.game.gamestate.players[i].alive) {
+        this.playerLabels[i].addColor('#f00', 0);
+      } else {
+        if (this.highlightHurt.find(n => { return n == this.game.gamestate.players[i].username; })) {
+          if (this.frame % 20 < 10) {
+            this.playerLabels[i].addColor('#f00', 0);
+          } else {
+            this.playerLabels[i].addColor('#fff', 0);
+          }
+        }
+      }
+
+      this.scoreLabels[i].text = '';
       for (let j=0;j<this.game.gamestate.players[i].strikes;++j) {
         this.scoreLabels[i].text += 'X';
       }

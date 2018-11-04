@@ -3,9 +3,10 @@ function randomIntFromInterval(min,max) {
 }
 
 const Player = class {
-  constructor(username, sock) {
+  constructor(username, sock, game) {
     this.username = username;
     this.sock = sock;
+    this.game = game;
 
     this.alive = true;
     this.strikes = 0;
@@ -15,11 +16,17 @@ const Player = class {
   Hurt() {
     this.strikes++;
 
-    if (this.strikes == 3) {
+    this.game.Send('NotifyHurt', {
+      playerName: this.username
+    });
+
+    if (this.strikes >= 3) {
       this.alive = false;
 
       this.sock.emit('YouAreDead', {});
     }
+    
+    this.game.SendGameState();
   }
 
   GetState() {
@@ -55,7 +62,19 @@ exports.Game = class {
 
   MinigameWinConditionMet() {
     if (this.minigameMetadata.minigameName == 'ReactionMinigame') {
-      // last player to react gets hit
+      // last player to react gets hit, all players who guess wrong get hit
+      const slowboys = [];
+      for (const player of this.players) {
+        if (!player.minigameState.guess) {
+          slowboys.push(player);
+        }
+      }
+
+      if (slowboys.length == 1) {
+        slowboys[0].Hurt();
+
+        return true;
+      }
     } else if (this.minigameMetadata.minigameName == 'TyperaceMinigame') {
       // last player to finish gets hit
       const unfinished = [];
@@ -82,7 +101,7 @@ exports.Game = class {
   }
 
   async PlayRandomMinigame() {
-    const random = randomIntFromInterval(0, 1);
+    const random = 0; //randomIntFromInterval(0, 1);
 
     // Reset all players minigame state
     for (const player of this.players) {
@@ -92,16 +111,17 @@ exports.Game = class {
     this.SendGameState();
 
     if (random == 0) {
-      function randLetter() {
-        var letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
-        var letter = letters[Math.floor(Math.random() * letters.length)];
-        return letter
-      }
+      const randLetter = () => {
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+        const letter = letters[Math.floor(Math.random() * letters.length)];
+
+        return letter;
+      };
 
       this.SetCurrentMinigame({
         roundNumber: this.roundNumber,
         minigameName: 'ReactionMinigame',
-        key: randLetter(),
+        letter: randLetter(),
         revealFrame: randomIntFromInterval(250, 600)
       })
     } else if (random == 1) {
@@ -145,6 +165,11 @@ exports.Game = class {
       this.Send('SetMetaState', {
         stateName: 'AfterMinigame'
       });
+
+      console.log(this.players.map(p => p.strikes));
+
+      // Wait a bit
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
 
@@ -152,13 +177,21 @@ exports.Game = class {
     if (this.players.find(p => p.username == username)) return;
     if (this.players.length >= 4) return;
 
-    const player = new Player(username, sock);
+    const player = new Player(username, sock, this);
     this.players.push(player);
 
     console.log(`${username} joined`);
 
     player.sock.on('SetMinigameState', minigameState => {
       player.minigameState = minigameState;
+
+      // edge case for wrong guess in reaction
+      if (this.minigameMetadata.minigameName == 'ReactionMinigame') {
+        if (this.minigameMetadata.letter != minigameState.guess) {
+          player.Hurt();
+        }
+      }
+
       this.SendGameState();
 
       if (this.MinigameWinConditionMet()) {
